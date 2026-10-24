@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleDisplayName</key><string>基金研判</string>
+  <key>CFBundleName</key><string>FundLensMobile</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>0.1.0</string>
+  <key>UILaunchScreen</key><dict/>
+  <key>UIRequiredDeviceCapabilities</key><array><string>arm64</string></array>
+  <key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationPortrait</string></array>
+  <key>NSPhotoLibraryUsageDescription</key><string>选择基金截图，在设备本地识别基金代码，不会上传截图。</string>
+  <key>NSLocalNetworkUsageDescription</key><string>连接你自己的电脑上的基金分析服务。</string>
+  <key>NSAppTransportSecurity</key><dict>
+    <!-- 仅用于第一阶段局域网HTTP联调。发布前必须移除并改用HTTPS。 -->
+    <key>NSAllowsArbitraryLoads</key><true/>
+  </dict>
+</dict></plist>

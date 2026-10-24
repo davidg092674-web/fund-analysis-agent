@@ -1,0 +1,42 @@
+name: FundLens iPhone - unsigned IPA
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    paths:
+      - 'ios-companion/**'
+      - '.github/workflows/build-fundlens-ios.yml'
+jobs:
+  build-ios:
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        working-directory: ios-companion
+        run: xcodegen generate --spec project.yml
+      - name: Compile unsigned iPhone app
+        working-directory: ios-companion
+        run: |
+          xcodebuild -project FundLensMobile.xcodeproj \
+            -scheme FundLensMobile -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: Create unsigned IPA for iLoader
+        working-directory: ios-companion
+        run: |
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/FundLensMobile.app" "$RUNNER_TEMP/Payload/"
+          (cd "$RUNNER_TEMP" && zip -qry "$GITHUB_WORKSPACE/ios-companion/FundLensMobile-unsigned.ipa" Payload)
+          unzip -t FundLensMobile-unsigned.ipa | tail -n 2
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FundLens-iPhone18Pro-unsigned-IPA
+          path: ios-companion/FundLensMobile-unsigned.ipa
+          retention-days: 7
