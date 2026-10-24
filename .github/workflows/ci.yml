@@ -26,6 +26,8 @@ jobs:
         run: python -m unittest test_my_funds -v
       - name: Run tests (backtest)
         run: python test_backtest.py
+      - name: Run tests (FundLens daily report)
+        run: python -m unittest test_daily_report -v
 
   frontend:
     runs-on: ubuntu-latest
