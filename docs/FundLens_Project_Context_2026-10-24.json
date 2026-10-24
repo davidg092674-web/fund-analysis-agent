@@ -1,0 +1,178 @@
+{
+  "schema_version": "3.0",
+  "project_name": "FundLens",
+  "updated_at": "2026-10-24",
+  "timezone": "Asia/Hong_Kong",
+  "historical_coverage": {
+    "complete": false,
+    "source_attachment": "FundLens_context_2026-10-20_2026-10-24.partial.json",
+    "missing_original_conversation_dates": [
+      "2026-10-20",
+      "2026-10-21",
+      "2026-10-22",
+      "2026-10-23"
+    ],
+    "note": "本次以可检查的仓库及部署证据补充工程状态，不声称恢复了缺失聊天正文。"
+  },
+  "goals": [
+    "私人云端PWA",
+    "手机脱离家用电脑和局域网",
+    "低长期成本",
+    "可追溯的每日基金研究报告",
+    "跨设备自选与持仓"
+  ],
+  "preferences": [
+    "优先直接修改GitHub并交付成品",
+    "减少重复手动操作",
+    "区分实现、验证和规划"
+  ],
+  "repository": {
+    "full_name": "davidg092674-web/fund-analysis-agent",
+    "default_branch": "master",
+    "baseline_commit": "b0b0f0c806d2c08428e5651661cf6ba68b305d98",
+    "baseline_tree": "f7b68f9d2e718f6a138b63191c5da22d3292ce4c",
+    "baseline_ci_url": "https://github.com/davidg092674-web/fund-analysis-agent/actions/runs/40076586619",
+    "baseline_ci_status": "success",
+    "new_pwa_source_directory": "cloud-pwa"
+  },
+  "cloud_pwa": {
+    "project_id": "appgprj_6adc968292cc8191b1c6bd04a0ba7ce1",
+    "url": "https://fundlens-research.steadyseal5.chatgpt.site",
+    "access": "owner-private",
+    "source_commit": "cc7c30b6928c63a96f008c1dc0c3966d486739f8",
+    "deployment_id": "appgdep_6adcbdc71760819186bde3b39b2926d9",
+    "deployment_status": "succeeded",
+    "runtime": "Sites / Cloudflare Workers JavaScript",
+    "storage": "D1",
+    "identity": "Sites authenticated user ID",
+    "python_engine_migrated": false,
+    "version_number": 5
+  },
+  "verified_new_work": [
+    "TypeScript、17项历史指标/盘中模型/解析测试、隔离SQLite实际API集成测试和生产构建通过",
+    "桌面与390px手机布局、映射弹窗与图表浏览器QA完成",
+    "私人版本3部署成功，DB共9张业务表",
+    "生产市场实测Eastmoney HTTP520、腾讯回退可取得沪深300/沪深300ETF的报价、分钟序列、真实日OHLC",
+    "生产两条国家统计局/央行原始事件写入读回成功，保留首次观测时间",
+    "周六盘前作业正确跳过，正式净值空清单刷新与状态读回成功",
+    "工作日14:30后台任务已创建启用，约22:30原任务prompt已更新，14:45仅网页打开可见时刷新",
+    "生产真实自选为空，尚无真实有效盘前样本，未验证预测或策略收益"
+  ],
+  "implementation": {
+    "entrypoint": "cloud-pwa/app/page.tsx",
+    "ui": "cloud-pwa/app/dashboard.tsx",
+    "api": "cloud-pwa/app/api/[...path]/route.ts",
+    "provider_and_metrics": "cloud-pwa/lib/research.ts",
+    "server_data": "cloud-pwa/lib/data-service.ts",
+    "database_schema": "cloud-pwa/db/schema.ts",
+    "migrations": "cloud-pwa/drizzle",
+    "workflow": "cloud-pwa/docs/refresh-workflow.md",
+    "pwa_manifest": "cloud-pwa/public/manifest.webmanifest",
+    "service_worker": "cloud-pwa/public/sw.js",
+    "decision_ui": "cloud-pwa/app/decision-desk.tsx",
+    "intraday_model": "cloud-pwa/lib/intraday.ts",
+    "intraday_server": "cloud-pwa/lib/desk-service.ts",
+    "intraday_api": "cloud-pwa/lib/desk-api.ts"
+  },
+  "limitations": [
+    "完整Python风险/预测/回测引擎和截图识别尚未迁云",
+    "正式净值和行情未完成独立双源核验",
+    "当前沪深价格适配，QDII/债券/未知基金不输出A股加权净值",
+    "需手动确认资产映射、持仓披露与费率；费用未自动核验",
+    "情景估值不是已验证预测，无真实有效样本或未来超额收益证据",
+    "14:45更新需要网页打开且可见，非独立后台任务",
+    "真实自选为空，首次预定盘前执行尚未发生",
+    "分红观察期暂停未复权费用收益比较；原历史指标仍为未复权净值",
+    "真机PWA安装、移动网络和跨设备登录尚待用户验证"
+  ],
+  "data_rules": {
+    "independent_dual_source_verified": false,
+    "auto_trade_enabled": false,
+    "stale_calendar_days_warning": 7,
+    "cache_hours": 6,
+    "manual_refresh_min_seconds": 60,
+    "max_watchlist_funds": 25,
+    "mapping_min_coverage": 0.8,
+    "mapping_max_age_days": 120,
+    "quote_max_age_minutes": 6,
+    "forecast_validated": false,
+    "future_edge_available": false,
+    "freeze_available_information": true,
+    "exact_nav_date_match": true,
+    "minimum_direction_sample_count": 20,
+    "supported_markets": [
+      "SH",
+      "SZ"
+    ],
+    "manual_fee_scenarios": true
+  },
+  "schedule": {
+    "status": "created_enabled",
+    "automation_id": "6adc9c53342081918ead683315a91f8c",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Hong_Kong:20261024T223000\nRRULE:FREQ=DAILY;BYHOUR=22;BYMINUTE=30;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "flexible_schedule",
+    "timezone": "Asia/Hong_Kong",
+    "linked_to_site": false,
+    "creation_method": "automations fallback after Sites create_schedule invalid_project",
+    "writer_verification": "production POST /api/jobs/refresh and GET /api/jobs/status matched persisted generatedAt; empty watchlist no-op",
+    "scheduled_occurrence_verification": "not_yet_run",
+    "prompt_revision": 3,
+    "preclose": {
+      "automation_id": "6adcac1397e0819181c9dd3644682be2",
+      "title": "生成 FundLens 盘前报告",
+      "enabled": true,
+      "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Hong_Kong:20261026T143000\nRRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=14;BYMINUTE=30;BYSECOND=0\nEND:VEVENT",
+      "timing_mode": "exact_schedule",
+      "timezone": "Asia/Hong_Kong",
+      "scheduled_occurrence_verification": "not_yet_run"
+    },
+    "refresh1445": {
+      "mode": "visible browser tab timer or manual",
+      "unattended": false
+    },
+    "evening_revision": 2
+  },
+  "next_priorities": [
+    "添加真实自选并手动确认资产/费率映射",
+    "积累无前视盘前快照与正式净值误差样本",
+    "核实数据授权与更多市场/基金类型适配",
+    "接入经核验的费用规则与复权收益",
+    "真机验证和复用Python完整引擎"
+  ],
+  "readability_update": {
+    "version": 4,
+    "scope": "responsive typography, fluid content width, contrast and compact wide layout",
+    "wide_preview_css_width": 2560,
+    "measured_font_px": {
+      "heading": 42.5,
+      "navigation": 20,
+      "notes": 16.25
+    },
+    "mobile_preview_css_width": 390,
+    "mobile_body_client_and_scroll_width": 375,
+    "mobile_dialog_client_and_scroll_width": 345,
+    "verification": [
+      "TypeScript passed",
+      "production build passed",
+      "browser desktop/wide/mobile/modal/report/settings QA passed"
+    ],
+    "data_logic_changed": false
+  },
+  "horizon_research": {
+    "implemented": true,
+    "entry_query": "/?view=research-list",
+    "private_storage": "research_list D1 table; metadata and latest analyses",
+    "separate_from_personal_holdings": true,
+    "service_auth": "owner-private Sites boundary, no forged visitor identity",
+    "money_fund_method": "paired income per 10000 and seven-day annualized disclosures; no fabricated NAV",
+    "evening_refresh_included": true,
+    "tests": 22,
+    "verification": [
+      "unit tests",
+      "actual route isolated SQLite integration",
+      "TypeScript",
+      "production build",
+      "desktop/mobile money detail UI"
+    ]
+  }
+}

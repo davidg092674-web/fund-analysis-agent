@@ -1,0 +1,39 @@
+name: FundLens cloud PWA
+
+on:
+  push:
+    branches: [master]
+    paths: ['cloud-pwa/**', '.github/workflows/cloud-pwa.yml']
+  pull_request:
+    branches: [master]
+    paths: ['cloud-pwa/**', '.github/workflows/cloud-pwa.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cloud-pwa:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cloud-pwa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: cloud-pwa/package.json
+          run_install: false
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check types
+        run: pnpm exec tsc --noEmit
+      - name: Test research and source validation
+        run: node --experimental-strip-types --test tests/research.test.ts tests/intraday.test.ts tests/catalog.test.ts tests/plan-import.test.ts
+      - name: Test authentication, ownership, caching and snapshots
+        run: node --experimental-vm-modules tests/api-integration.mjs
+      - name: Build private cloud application
+        run: pnpm run build

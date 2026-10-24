@@ -1,0 +1,12 @@
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+export const funds = sqliteTable("funds", { id: text("id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), body: text("body").notNull(), updatedAt: text("updated_at").notNull() });
+export const reports = sqliteTable("reports", { id: text("id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), navDate: text("nav_date").notNull(), body: text("body").notNull(), generatedAt: text("generated_at").notNull() });
+export const navCache = sqliteTable("nav_cache", { code: text("code").primaryKey(), body: text("body").notNull(), fetchedAt: text("fetched_at").notNull() });
+export const refreshRuns = sqliteTable("refresh_runs", { id: text("id").primaryKey(), body: text("body").notNull(), generatedAt: text("generated_at").notNull() });
+export const mappings = sqliteTable("mappings", { id: text("id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), body: text("body").notNull(), createdAt: text("created_at").notNull(), updatedAt: text("updated_at").notNull() });
+export const marketCache = sqliteTable("market_cache", { symbol: text("symbol").primaryKey(), body: text("body").notNull(), fetchedAt: text("fetched_at").notNull() });
+export const events = sqliteTable("events", { id: text("id").primaryKey(), body: text("body").notNull(), publishedAt: text("published_at").notNull(), firstSeenAt: text("first_seen_at").notNull() });
+export const snapshots = sqliteTable("snapshots", { id: text("id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), businessDate: text("business_date").notNull(), body: text("body").notNull(), capturedAt: text("captured_at").notNull() });
+export const evaluations = sqliteTable("evaluations", { snapshotId: text("snapshot_id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), body: text("body").notNull(), updatedAt: text("updated_at").notNull() });
+// Site-wide research candidates. These are never personal holdings or orders.
+export const researchList = sqliteTable("research_list", { code: text("code").primaryKey(), body: text("body").notNull(), updatedAt: text("updated_at").notNull() });
