@@ -34,6 +34,7 @@ class AnalyzeResponse(BaseModel):
     datasource_status: Optional[dict] = None
     decision_advice: Optional[dict] = None
     final_decision: Optional[dict] = None
+    daily_report: Optional[dict] = None
     high_confidence_decision: Optional[dict] = None
     error: Optional[str] = None
 
@@ -79,6 +80,7 @@ class BatchFundResult(BaseModel):
     datasource_status: Optional[dict] = None
     decision_advice: Optional[dict] = None
     final_decision: Optional[dict] = None
+    daily_report: Optional[dict] = None
     high_confidence_decision: Optional[dict] = None
 
 
