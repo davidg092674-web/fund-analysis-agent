@@ -48,9 +48,53 @@ struct FundResponse: Decodable {
     let metrics: FundMetrics?
     let risk: FundRisk?
     let final_decision: FinalConclusion?
+    let daily_report: DailyResearch?
     let error: String?
 }
-struct AnalyzeInput: Encodable { let code: String }
+struct DailyFact: Decodable {
+    let label: String
+    let value: String
+    let explanation: String?
+}
+struct DailySection: Decodable {
+    let title: String
+    let summary: String
+    let facts: [DailyFact]
+    let evidence: [String]
+}
+struct DailyScenario: Decodable {
+    let name: String
+    let condition: String
+    let reason: String
+    let status: String
+}
+struct DailyResearch: Decodable {
+    let edition: String
+    let generated_at: String
+    let as_of_nav_date: String
+    let data_status: String
+    let action_enabled: Bool
+    let headline: String
+    let model_action: String
+    let executive_summary: String
+    let highlights: [DailyFact]
+    let sections: [DailySection]
+    let action_matrix: [DailyScenario]
+    let data_warnings: [String]
+    let next_checklist: [String]
+    let conclusion_note: String
+}
+struct ClientPosition: Encodable {
+    let cost_nav: Double?
+    let holding_amount: Double?
+    let max_loss_percent: Double?
+    let holding_horizon: String?
+}
+struct AnalyzeInput: Encodable {
+    let code: String
+    let position: ClientPosition?
+}
+
 
 // MARK: - Vision OCR (all screenshot processing stays on the phone)
 enum ScreenshotOCR {
@@ -172,6 +216,11 @@ struct FundLensHomeView: View {
     @State private var isLoading = false
     @State private var showSettings = false
     @State private var confirmed = false
+    @State private var costText = ""
+    @State private var holdingText = ""
+    @State private var lossText = ""
+    @State private var horizon = "未填写"
+    @FocusState private var isHoldingInputFocused: Bool
     @FocusState private var isFundCodeFocused: Bool
 
     private var codeValid: Bool { code.count == 6 && code.allSatisfy(\.isNumber) }
@@ -180,12 +229,13 @@ struct FundLensHomeView: View {
         GeometryReader { geometry in
             ZStack {
                 LensStyle.background.ignoresSafeArea()
-                    .onTapGesture { isFundCodeFocused = false }
+                    .onTapGesture { isFundCodeFocused = false; isHoldingInputFocused = false }
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 18) {
                         header
                         screenshotCard
                         verificationCard
+                        holdingCard
                         analysisCard
                         if let result { reportCards(result) }
                         usageCard
@@ -373,6 +423,71 @@ struct FundLensHomeView: View {
         }
     }
 
+    private var holdingCard: some View {
+        LensCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("个人持仓信息（选填）")
+                        .font(.title3.weight(.semibold))
+                    Spacer()
+                    Image(systemName: "person.crop.rectangle.stack")
+                        .foregroundStyle(LensStyle.teal)
+                }
+                Text("用于解释持仓盈亏与风险约束；不填写时只会生成通用研究报告。")
+                    .font(.subheadline)
+                    .foregroundStyle(LensStyle.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 10) {
+                    holdingTextField("成本单位净值", text: $costText)
+                    holdingTextField("持有市值（元）", text: $holdingText)
+                }
+                holdingTextField("最大可接受亏损（%）", text: $lossText)
+                HStack {
+                    Text("预计持有期限")
+                        .font(.subheadline)
+                        .foregroundStyle(LensStyle.muted)
+                    Spacer(minLength: 6)
+                    Picker("预计持有期限", selection: $horizon) {
+                        Text("未填写").tag("未填写")
+                        Text("1个月内").tag("1个月内")
+                        Text("1—6个月").tag("1—6个月")
+                        Text("6个月以上").tag("6个月以上")
+                    }
+                    .tint(LensStyle.teal)
+                }
+                if isHoldingInputFocused {
+                    Button("完成输入，收起键盘") { isHoldingInputFocused = false }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(LensStyle.teal)
+                }
+                SmallInfoRow(
+                    symbol: "lock.shield",
+                    color: LensStyle.teal,
+                    title: "不读取支付宝账户；如填写，这些数字将通过当前局域网连接传给你自己的 Windows 分析服务。原型 HTTP 传输未加密，不要在不可信网络使用。"
+                )
+            }
+        }
+    }
+
+    private func holdingTextField(_ title: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(LensStyle.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            TextField("可留空", text: text)
+                .keyboardType(.decimalPad)
+                .focused($isHoldingInputFocused)
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 46)
+                .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 11))
+                .overlay(RoundedRectangle(cornerRadius: 11).strokeBorder(LensStyle.border))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     private var analysisCard: some View {
         LensCard {
             VStack(alignment: .leading, spacing: 14) {
@@ -420,7 +535,7 @@ struct FundLensHomeView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "lock.shield")
                         .foregroundStyle(LensStyle.teal)
-                    Text("截图只在手机本地 OCR；仅发送已确认的基金代码。")
+                    Text("截图仅在手机本地 OCR；向电脑发送基金代码及你自愿填写的持仓数据。")
                         .font(.caption)
                         .foregroundStyle(LensStyle.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -433,67 +548,161 @@ struct FundLensHomeView: View {
         VStack(alignment: .leading, spacing: 18) {
             LensCard {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("基金身份核对")
-                        .font(.headline)
+                    Text("基金身份核对").font(.headline)
                     Text(data.fund?.name ?? "未核验基金名称")
                         .font(.title3.weight(.semibold))
-                    Text("基金代码：\(data.code) · 类别：\(data.fund?.type ?? "未知")")
+                    Text("代码：\(data.code) · 类别：\(data.fund?.type ?? "未知")")
                         .font(.subheadline)
                         .foregroundStyle(LensStyle.muted)
                     SmallInfoRow(symbol: "checkmark.shield", color: LensStyle.teal,
-                                 title: "名称来自查询服务，请再次比对截图，避免 A/C 份额识别错误。")
+                                 title: "请与截图、基金公司公告核对名称和 A/C 份额类别。")
                 }
             }
-            LensCard {
-                VStack(alignment: .leading, spacing: 11) {
-                    Text("净值与数据说明")
-                        .font(.headline)
-                    valueRow("最新净值日期", data.metrics?.data_end ?? "未知")
-                    valueRow("单位净值", data.metrics?.latest_nav.map { String(format: "%.4f", $0) } ?? "未知")
-                    valueRow("历史数据数量", "\(data.metrics?.data_days ?? 0) 条")
-                    valueRow("当前名称来源", data.fund?.source ?? "未知")
-                    SmallInfoRow(symbol: "info.circle", color: .orange,
-                                 title: "尚未执行双源正式净值交叉核验；不能视为已核验的实时交易数据。")
-                }
-            }
-            LensCard {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("研究结论与观察条件")
-                        .font(.headline)
-                    let problems = DataGate.issues(data)
-                    if !problems.isEmpty {
-                        Label("数据待核验，暂不形成操作判断", systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.orange)
-                            .font(.headline)
-                        ForEach(problems, id: \.self) { problem in
-                            SmallInfoRow(symbol: "exclamationmark.circle", color: .orange, title: problem)
-                        }
-                    } else {
+            if let daily = data.daily_report {
+                dailyReportCards(daily)
+            } else {
+                LensCard {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("简版研究结论").font(.headline)
                         Text(data.final_decision?.headline ?? "暂无模型结论")
                             .font(.title3.weight(.semibold))
-                        valueRow("模型动作", data.final_decision?.action_label ?? "未知")
-                        valueRow("模型置信度", data.final_decision?.confidence ?? "未知")
-                        valueRow("内部风险评分", data.risk?.risk_score.map { String(format: "%.1f / 100", $0) } ?? "未知")
-                        if let summary = data.final_decision?.summary {
-                            Text(summary)
+                        Text(data.final_decision?.summary ?? "当前后端不包含每日详细报告，请更新 Windows 端代码并重启 Python 服务。")
+                            .font(.subheadline)
+                            .foregroundStyle(LensStyle.muted)
+                    }
+                }
+            }
+        }
+    }
+
+    private func dailyReportCards(_ daily: DailyResearch) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            LensCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Label("每日基金研究报告", systemImage: "doc.text.magnifyingglass")
+                            .font(.headline)
+                        Spacer(minLength: 6)
+                        Text(daily.data_status)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.orange)
+                    }
+                    Text(daily.headline)
+                        .font(.title3.weight(.bold))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(daily.executive_summary)
+                        .font(.subheadline)
+                        .foregroundStyle(LensStyle.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                    valueRow("最新净值日期", daily.as_of_nav_date)
+                    valueRow("报告生成时间", daily.generated_at)
+                    Label("仅供研究；当前不具备自动执行交易条件", systemImage: "info.circle")
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            LensCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("关键指标速览").font(.headline)
+                    ForEach(daily.highlights.indices, id: \.self) { i in
+                        let item = daily.highlights[i]
+                        valueRow(item.label, item.value)
+                        if let explanation = item.explanation, !explanation.isEmpty {
+                            Text(explanation)
+                                .font(.caption)
+                                .foregroundStyle(LensStyle.muted)
+                        }
+                    }
+                }
+            }
+
+            ForEach(daily.sections.indices, id: \.self) { i in
+                let section = daily.sections[i]
+                LensCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(section.title)
+                            .font(.title3.weight(.semibold))
+                        Text(section.summary)
+                            .font(.subheadline)
+                            .foregroundStyle(LensStyle.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                        ForEach(section.facts.indices, id: \.self) { j in
+                            let fact = section.facts[j]
+                            valueRow(fact.label, fact.value)
+                            if let explanation = fact.explanation, !explanation.isEmpty {
+                                Text(explanation)
+                                    .font(.caption)
+                                    .foregroundStyle(LensStyle.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        ForEach(section.evidence.indices, id: \.self) { j in
+                            SmallInfoRow(symbol: "info.circle", color: LensStyle.blue,
+                                         title: section.evidence[j])
+                        }
+                    }
+                }
+            }
+
+            LensCard {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("申购、持有与赎回：条件矩阵")
+                        .font(.title3.weight(.semibold))
+                    Text("以下是未来需要观察和核对的条件，不是今天应立即执行的买卖指令。")
+                        .font(.subheadline)
+                        .foregroundStyle(LensStyle.muted)
+                    ForEach(daily.action_matrix.indices, id: \.self) { i in
+                        let scenario = daily.action_matrix[i]
+                        VStack(alignment: .leading, spacing: 7) {
+                            HStack {
+                                Text(scenario.name)
+                                    .font(.headline)
+                                Spacer(minLength: 6)
+                                Text(scenario.status)
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(.orange)
+                            }
+                            Text("观察条件：\(scenario.condition)")
+                                .font(.subheadline)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Text("原因与约束：\(scenario.reason)")
                                 .font(.subheadline)
                                 .foregroundStyle(LensStyle.muted)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
-                        if data.final_decision?.confidence == "低" {
-                            SmallInfoRow(symbol: "exclamationmark.triangle", color: .orange,
-                                         title: "模型置信度低，不应当作可执行交易信号。")
-                        }
-                        ForEach(data.final_decision?.why ?? [], id: \.self) { item in
-                            SmallInfoRow(symbol: "checkmark.circle", color: LensStyle.teal, title: "依据：\(item)")
-                        }
-                        ForEach(data.final_decision?.watch ?? [], id: \.self) { item in
-                            SmallInfoRow(symbol: "eye", color: LensStyle.blue, title: "观察：\(item)")
-                        }
-                        ForEach(data.final_decision?.warning ?? [], id: \.self) { item in
-                            SmallInfoRow(symbol: "exclamationmark.triangle", color: .orange, title: "风险：\(item)")
+                        if i < daily.action_matrix.count - 1 {
+                            Rectangle().fill(LensStyle.border).frame(height: 1)
                         }
                     }
+                }
+            }
+
+            LensCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("数据质量与无法核实的信息", systemImage: "exclamationmark.shield")
+                        .font(.headline)
+                        .foregroundStyle(.orange)
+                    ForEach(daily.data_warnings.indices, id: \.self) { i in
+                        SmallInfoRow(symbol: "exclamationmark.triangle", color: .orange,
+                                     title: daily.data_warnings[i])
+                    }
+                }
+            }
+
+            LensCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("下次操作前核对清单", systemImage: "checklist")
+                        .font(.headline)
+                    ForEach(daily.next_checklist.indices, id: \.self) { i in
+                        SmallInfoRow(symbol: "square", color: LensStyle.teal,
+                                     title: daily.next_checklist[i])
+                    }
+                    Text(daily.conclusion_note)
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -545,7 +754,7 @@ struct FundLensHomeView: View {
                     Text("图片只做 iPhone 本机 OCR；分析 API 只发送基金代码。请勿向公网开放未授权的 HTTP 分析服务。")
                         .font(.footnote)
                 }
-                Section("应用") { Text("FundLens · v0.2.0") }
+                Section("应用") { Text("FundLens · 每日研究报告 v0.3") }
             }
             .navigationTitle("连接设置")
             .navigationBarTitleDisplayMode(.inline)
@@ -578,6 +787,7 @@ struct FundLensHomeView: View {
 
     @MainActor private func analyze() async {
         isFundCodeFocused = false
+        isHoldingInputFocused = false
         errorText = ""
         result = nil
         isLoading = true
@@ -593,7 +803,17 @@ struct FundLensHomeView: View {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = 60
         do {
-            request.httpBody = try JSONEncoder().encode(AnalyzeInput(code: code))
+            let pos = ClientPosition(
+                cost_nav: Double(costText),
+                holding_amount: Double(holdingText),
+                max_loss_percent: Double(lossText),
+                holding_horizon: horizon == "未填写" ? nil : horizon
+            )
+            let hasPosition = pos.cost_nav != nil || pos.holding_amount != nil
+                || pos.max_loss_percent != nil || pos.holding_horizon != nil
+            request.httpBody = try JSONEncoder().encode(
+                AnalyzeInput(code: code, position: hasPosition ? pos : nil)
+            )
             let (data, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
                 throw NSError(domain: "FundLens", code: 1,
