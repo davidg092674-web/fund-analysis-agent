@@ -137,10 +137,13 @@ def build_daily_report(fund, fund_profile, metrics, risk, forecast,
     current_value = _num(position, "holding_amount")
     units = _num(position, "holding_units")
     max_loss = _num(position, "max_loss_percent")
+    holding_horizon = str(position.get("holding_horizon") or "未提供")
     has_position = (cost is not None and cost > 0) or (current_value is not None and current_value > 0) or (units is not None and units > 0)
     if cost is not None and cost > 0 and nav is not None and nav > 0:
         hypothetical_gain = (nav / cost - 1) * 100
         position_note = f"基于输入成本净值 {cost:.4f} 和最近单位净值的简单变动为 {hypothetical_gain:+.2f}%；未计分红、手续费及实际批次成本。"
+        if max_loss is not None and max_loss > 0 and hypothetical_gain <= -max_loss:
+            position_note += f" 简单净值变动已达到用户设置的亏损观察阈值（-{max_loss:.1f}%）；应检查实际成本、分红及赎回费用，不自动触发赎回。"
     elif has_position:
         position_note = "已提供部分持仓信息，但缺少有效成本净值，无法判断实际持仓盈亏与应否赎回。"
     else:
@@ -204,6 +207,7 @@ def build_daily_report(fund, fund_profile, metrics, risk, forecast,
             _fact("成本净值", _nav(cost)),
             _fact("持有市值（如已输入）", "未提供" if current_value is None else f"{current_value:,.2f}"),
             _fact("可接受最大亏损", "未提供" if max_loss is None else _plain_pct(max_loss)),
+            _fact("计划持有期限", holding_horizon),
             _fact("实际申购/赎回费", "未核实"),
         ], ["赎回费率通常与基金份额类别及持有期限有关，尤其需核对分批申购的每批持有天数。"]),
     ]
