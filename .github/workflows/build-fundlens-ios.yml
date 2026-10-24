@@ -27,6 +27,15 @@ jobs:
             -sdk iphoneos -destination 'generic/platform=iOS' \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO build
+      - name: Verify display name and bundled icon
+        working-directory: ios-companion
+        run: |
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/FundLensMobile.app"
+          test -f "$APP/Info.plist"
+          test -f "$APP/Assets.car"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleDisplayName" "$APP/Info.plist" | grep -Fx 'FundLens'
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist" | grep -Fx 'com.personal.fundlens.iphone18pro'
+          echo '✅ Display name, Bundle ID, and compiled asset catalog verified.'
       - name: Create unsigned IPA for iLoader
         working-directory: ios-companion
         run: |

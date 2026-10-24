@@ -13,6 +13,7 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: Assets.xcassets
     info:
       path: Info.plist
     settings:
@@ -20,7 +21,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.personal.fundlens.iphone18pro
         PRODUCT_NAME: FundLensMobile
         CODE_SIGNING_ALLOWED: NO
-        ASSETCATALOG_COMPILER_APPICON_NAME: ''
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_UIApplicationSupportsDocumentBrowser: NO
         SUPPORTS_MACCATALYST: NO
     scheme:
