@@ -172,6 +172,7 @@ struct FundLensHomeView: View {
     @State private var isLoading = false
     @State private var showSettings = false
     @State private var confirmed = false
+    @FocusState private var isFundCodeFocused: Bool
 
     private var codeValid: Bool { code.count == 6 && code.allSatisfy(\.isNumber) }
 
@@ -179,6 +180,7 @@ struct FundLensHomeView: View {
         GeometryReader { geometry in
             ZStack {
                 LensStyle.background.ignoresSafeArea()
+                    .onTapGesture { isFundCodeFocused = false }
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 18) {
                         header
@@ -195,6 +197,7 @@ struct FundLensHomeView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .background(alignment: .top) { headerGlow }
+                .scrollDismissesKeyboard(.interactively)
             }
         }
         .sheet(isPresented: $showSettings) { settingsView }
@@ -291,6 +294,7 @@ struct FundLensHomeView: View {
                         ForEach(candidates.prefix(4), id: \.self) { candidate in
                             Button(candidate) {
                                 code = candidate
+                                isFundCodeFocused = false
                                 confirmed = false
                                 result = nil
                             }
@@ -305,21 +309,34 @@ struct FundLensHomeView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("基金代码")
                         .font(.subheadline.weight(.medium))
-                    TextField("请输入六位基金代码", text: $code)
-                        .keyboardType(.numberPad)
-                        .font(.system(.title3, design: .rounded, weight: .semibold))
-                        .monospacedDigit()
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 14)
-                        .frame(minHeight: 52)
-                        .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 12))
-                        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(LensStyle.border))
-                        .onChange(of: code) { _, newValue in
-                            let filtered = String(newValue.filter(\.isNumber).prefix(6))
-                            if filtered != newValue { code = filtered }
-                            confirmed = false
-                            result = nil
+                    HStack(spacing: 8) {
+                        TextField("请输入六位基金代码", text: $code)
+                            .keyboardType(.numberPad)
+                            .focused($isFundCodeFocused)
+                            .submitLabel(.done)
+                            .onSubmit { isFundCodeFocused = false }
+                            .font(.system(.title3, design: .rounded, weight: .semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 14)
+                            .frame(minHeight: 52)
+                            .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(LensStyle.border))
+                            .onChange(of: code) { _, newValue in
+                                let filtered = String(newValue.filter(\.isNumber).prefix(6))
+                                if filtered != newValue { code = filtered }
+                                confirmed = false
+                                result = nil
+                                if filtered.count == 6 { isFundCodeFocused = false }
+                            }
+                        if isFundCodeFocused {
+                            Button("完成") { isFundCodeFocused = false }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(LensStyle.teal)
+                                .frame(minHeight: 44)
+                                .accessibilityLabel("收起数字键盘")
                         }
+                    }
                 }
                 if !recognizedLines.isEmpty {
                     DisclosureGroup("查看本机 OCR 识别文字") {
@@ -560,6 +577,7 @@ struct FundLensHomeView: View {
     }
 
     @MainActor private func analyze() async {
+        isFundCodeFocused = false
         errorText = ""
         result = nil
         isLoading = true
