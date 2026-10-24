@@ -159,3 +159,55 @@ body { line-height: 1.7; }
   .roadmap-step { flex-wrap: wrap; }
   .roadmap-step > div { flex: 1; min-width: 0; }
 }
+
+
+/* Horizon research candidates are distinct from private positions. */
+.research-shelf { display: grid; gap: 24px; }
+.shelf-intro { display: flex; gap: 16px; align-items: flex-start; padding: 22px 24px; border: 1px solid #dce5d3; border-radius: 8px; background: #eaf0e4; }
+.shelf-intro > svg { margin-top: 4px; color: #537347; }
+.shelf-intro strong { font-size: 1.125rem; font-weight: 600; }
+.shelf-intro p { font-size: .875rem; color: var(--muted); margin-top: 7px; line-height: 1.9; max-width: 100ch; }
+.shelf-toolbar, .shelf-toolbar > div { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.shelf-toolbar > p { font-size: .9375rem; color: var(--muted); }
+.shelf-group .section-heading > p { font-size: .875rem; color: var(--muted); }
+.shelf-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.shelf-card { padding: 23px; min-width: 0; display: flex; flex-direction: column; }
+.shelf-card.selected { border-color: #6a8a63; box-shadow: 0 0 0 2px #deead7; }
+.shelf-card-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.shelf-period { display: flex; gap: 7px; align-items: baseline; font-size: .8125rem; color: #526e45; }
+.shelf-period svg { align-self: center; }
+.shelf-card h3 { font-size: 1.125rem; line-height: 1.7; font-weight: 600; margin-top: 14px; }
+.shelf-card > p { font-size: .875rem; line-height: 1.9; margin-top: 10px; color: #546650; }
+.shelf-card > .shelf-code { font-size: .8125rem; color: var(--muted); margin-top: 2px; letter-spacing: .02em; }
+.shelf-card > .shelf-caution { color: #805b3c; }
+.shelf-card > .shelf-relationship { background: #f2f5ed; border-radius: 4px; padding: 9px 12px; color: #5a7151; }
+.shelf-analysis-status { display: flex; flex-wrap: wrap; gap: 5px 7px; align-items: center; padding-block: 16px; margin-top: auto; color: #58724c; font-size: .8125rem; }
+.shelf-analysis-status > p { width: 100%; color: #a0523d; }
+.shelf-card-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .75rem; color: var(--muted); }
+.shelf-card-footer > a { display: flex; gap: 3px; align-items: center; }
+.shelf-card-footer > button { margin-left: auto; font-size: .875rem; }
+.shelf-detail { scroll-margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--line); }
+.money-study { padding: 25px; }
+.money-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin: 25px 0; }
+.money-metrics small { display: block; color: var(--muted); font-size: .875rem; }
+.money-metrics strong { display: block; font-size: 1.875rem; font-weight: 500; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.money-metrics > div:last-child strong { font-size: 1.375rem; }
+.money-metrics p { color: var(--muted); font-size: .8125rem; margin-top: 7px; }
+.money-history { margin-top: 22px; }
+.money-history summary { cursor: pointer; padding-bottom: 12px; font-size: .9375rem; }
+.money-warnings { padding: 17px 17px 17px 32px; background: #f4f7ef; border-radius: 5px; font-size: .8125rem; line-height: 1.9; color: var(--muted); margin-top: 20px; }
+@media (min-width: 2100px) { .shelf-cards { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 1100px) { .shelf-cards { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .research-shelf { gap: 20px; }
+  .shelf-intro { padding: 18px 16px; gap: 10px; }
+  .shelf-card { padding: 20px 17px; }
+  .shelf-toolbar > div { width: 100%; }
+  .shelf-toolbar button { font-size: .8125rem; padding-inline: 11px; }
+  .shelf-card-footer { gap: 8px; }
+  .shelf-detail > .section-heading h2 { font-size: 1.125rem; }
+  .money-study { padding: 20px 17px; }
+  .money-metrics { grid-template-columns: 1fr; gap: 18px; }
+  .money-metrics > div { border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+  .mobile-nav button { font-size: .6875rem; }
+}

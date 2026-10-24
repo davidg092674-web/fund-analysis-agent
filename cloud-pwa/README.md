@@ -36,7 +36,7 @@
 
 ```sh
 npm run install:ci
-node --experimental-strip-types --test tests/research.test.ts tests/intraday.test.ts
+node --experimental-strip-types --test tests/research.test.ts tests/intraday.test.ts tests/catalog.test.ts
 node --experimental-vm-modules tests/api-integration.mjs
 node node_modules/typescript/bin/tsc --noEmit
 npm run build
@@ -55,3 +55,7 @@ npm run build
 ## 手机使用
 
 Safari 打开已部署网址 → 使用站点所有者的 ChatGPT 账户登录 → 分享 → 添加到主屏幕。输入代码查询后，在报告页加入自选并补充持仓。网络恢复后才能读取私人数据。PWA 配置与移动布局已经实现，实际 iPhone 安装和跨设备登录仍需用户真机验证。
+
+### Horizon research list
+
+The private Site research list holds explicitly imported candidate metadata and latest analyses separately from actual user holdings and immutable report/snapshot archives. It sorts candidates by suggested holding horizon, marks alternatives and waiting-for-opening items, and refreshes with the evening job. Money funds display verified paired income-per-10,000 and seven-day annualized disclosures; they do not enter the unit-NAV or preclose stock model. Research candidates and account data must not be committed to this public source mirror.

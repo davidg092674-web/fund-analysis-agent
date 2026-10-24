@@ -1,4 +1,5 @@
 import { handleDesk } from '../../../lib/desk-api';
+import { handleCatalog } from '../../../lib/catalog-service';
 import { database, cleanPosition, generate, readFunds, dataset } from "../../../lib/data-service";
 import { fundCode, makeReport } from "../../../lib/research";
 export const dynamic = "force-dynamic";
@@ -7,6 +8,7 @@ async function handle(request: Request) {
   const path = new URL(request.url).pathname.replace(/^\/api\//, ""), uid = request.headers.get("oai-authenticated-user-id");
   try {
     if (request.method !== "GET" && request.headers.get("origin") && request.headers.get("origin") !== new URL(request.url).origin) return json({ error: "请求来源不匹配。" }, 403);
+    const catalogResponse = await handleCatalog(request, path, uid); if (catalogResponse) return catalogResponse;
     const deskResponse = await handleDesk(request, path, uid); if (deskResponse) return deskResponse;
     // Shared updater relies on the owner-private Sites dispatch service boundary.
     // Changing this Site's audience requires replacing this authorization first.

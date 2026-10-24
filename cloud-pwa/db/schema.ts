@@ -8,3 +8,5 @@ export const marketCache = sqliteTable("market_cache", { symbol: text("symbol").
 export const events = sqliteTable("events", { id: text("id").primaryKey(), body: text("body").notNull(), publishedAt: text("published_at").notNull(), firstSeenAt: text("first_seen_at").notNull() });
 export const snapshots = sqliteTable("snapshots", { id: text("id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), businessDate: text("business_date").notNull(), body: text("body").notNull(), capturedAt: text("captured_at").notNull() });
 export const evaluations = sqliteTable("evaluations", { snapshotId: text("snapshot_id").primaryKey(), userId: text("user_id").notNull(), code: text("code").notNull(), body: text("body").notNull(), updatedAt: text("updated_at").notNull() });
+// Site-wide research candidates. These are never personal holdings or orders.
+export const researchList = sqliteTable("research_list", { code: text("code").primaryKey(), body: text("body").notNull(), updatedAt: text("updated_at").notNull() });

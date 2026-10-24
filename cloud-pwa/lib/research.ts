@@ -16,7 +16,7 @@ export function fundCode(value: unknown): string {
   if (!/^\d{6}$/.test(code)) throw new Error("请输入完整的六位基金代码，保留开头的 0。");
   return code;
 }
-function assignedValue(source: string, variable: string): unknown {
+export function assignedValue(source: string, variable: string): unknown {
   const match = new RegExp("(?:var|let|const)\\s+" + variable + "\\s*=\\s*").exec(source);
   if (!match) throw new Error("数据源缺少 " + variable + " 字段。");
   let pos = match.index + match[0].length;

@@ -4,7 +4,7 @@ export function database() {
   if (!env.DB) throw new Error("云端数据库暂时不可用，请稍后重试。");
   return env.DB;
 }
-async function boundedText(response: Response) {
+export async function boundedText(response: Response) {
   if (!response.ok || !response.body) throw new Error("数据源暂不可用（HTTP " + response.status + "），请稍后重试。");
   const reader = response.body.getReader(), parts: Uint8Array[] = []; let bytes = 0;
   try { while (true) { const { done, value } = await reader.read(); if (done) break; bytes += value.byteLength; if (bytes > 6_000_000) throw new Error("数据源响应过大，已停止处理。"); parts.push(value); } }

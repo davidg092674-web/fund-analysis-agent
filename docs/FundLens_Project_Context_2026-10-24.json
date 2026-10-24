@@ -39,14 +39,14 @@
     "project_id": "appgprj_6adc968292cc8191b1c6bd04a0ba7ce1",
     "url": "https://fundlens-research.steadyseal5.chatgpt.site",
     "access": "owner-private",
-    "source_commit": "645165587adfe74e73bbed968e6bc234737be699",
-    "deployment_id": "appgdep_6adcb17adde08191ab3b374d37721dbb",
+    "source_commit": "cc7c30b6928c63a96f008c1dc0c3966d486739f8",
+    "deployment_id": "appgdep_6adcbdc71760819186bde3b39b2926d9",
     "deployment_status": "succeeded",
     "runtime": "Sites / Cloudflare Workers JavaScript",
     "storage": "D1",
     "identity": "Sites authenticated user ID",
     "python_engine_migrated": false,
-    "version_number": 4
+    "version_number": 5
   },
   "verified_new_work": [
     "TypeScript、17项历史指标/盘中模型/解析测试、隔离SQLite实际API集成测试和生产构建通过",
@@ -116,7 +116,7 @@
     "creation_method": "automations fallback after Sites create_schedule invalid_project",
     "writer_verification": "production POST /api/jobs/refresh and GET /api/jobs/status matched persisted generatedAt; empty watchlist no-op",
     "scheduled_occurrence_verification": "not_yet_run",
-    "prompt_revision": 2,
+    "prompt_revision": 3,
     "preclose": {
       "automation_id": "6adcac1397e0819181c9dd3644682be2",
       "title": "生成 FundLens 盘前报告",
@@ -157,5 +157,22 @@
       "browser desktop/wide/mobile/modal/report/settings QA passed"
     ],
     "data_logic_changed": false
+  },
+  "horizon_research": {
+    "implemented": true,
+    "entry_query": "/?view=research-list",
+    "private_storage": "research_list D1 table; metadata and latest analyses",
+    "separate_from_personal_holdings": true,
+    "service_auth": "owner-private Sites boundary, no forged visitor identity",
+    "money_fund_method": "paired income per 10000 and seven-day annualized disclosures; no fabricated NAV",
+    "evening_refresh_included": true,
+    "tests": 22,
+    "verification": [
+      "unit tests",
+      "actual route isolated SQLite integration",
+      "TypeScript",
+      "production build",
+      "desktop/mobile money detail UI"
+    ]
   }
 }

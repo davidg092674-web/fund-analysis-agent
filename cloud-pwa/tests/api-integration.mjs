@@ -49,4 +49,21 @@ assert.equal((await call('events','POST',{events:[{...event,sourceUrl:'https://w
 assert.equal((await call('desk','GET',undefined,'test-a')).body.events.length,1);
 assert.equal((await call('events','POST',{events:[{...event,sourceUrl:'https://csrc.gov.cn.evil.example/test'}]},'test-a')).status,400);
 assert.equal((await call('intraday','POST',{code:'000011'},'test-b')).status,400);
+// Research metadata is shared within the private Site, and never masquerades as a user's holdings.
+const countBefore=sqlite.prepare('SELECT COUNT(*) AS n FROM funds').get().n;
+const candidate={code:'000011',name:'测试基金',kind:'equity',minMonths:60,holdingLabel:'至少5年',order:2,rationale:'测试说明',caution:'测试风险',relationship:'',sourceUrl:'https://www.efunds.com.cn/',recommendedAt:'2026-10-24',state:'candidate'};
+assert.equal((await call('research-list')).status,401);
+assert.equal((await call('jobs/research-list','POST',{entries:[candidate]},undefined,'https://evil.example')).status,403);
+assert.equal((await call('jobs/research-list','POST',{entries:[candidate]})).status,200);
+assert.equal((await call('jobs/research-list/analyze','POST',{code:'000011'})).status,200);
+assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM funds').get().n,countBefore);
+assert.equal((await call('research-list','GET',undefined,'test-a')).body.entries.length,1);
+const shared=(await call('research-list/000011','GET',undefined,'test-b')).body.entry;
+assert.equal(shared.analysis.report.position,null);
+assert.equal((await call('jobs/research-list','POST',{entries:[candidate,candidate]})).status,400);
+assert.equal((await call('jobs/research-list','POST',{entries:[{...candidate,code:'000012',kind:'money',minMonths:0,order:1}]})).status,200);
+assert.equal((await call('jobs/research-list/analyze','POST',{code:'000012'})).status,400);
+const failed=(await call('research-list/000012','GET',undefined,'test-a')).body.entry;
+assert.ok(failed.error);assert.equal(failed.analysis,undefined);
+assert.equal((await call('research-list','GET',undefined,'test-a')).body.entries[0].code,'000012');
 console.log('PASS: authentication, cross-origin writes, fund/report tenant isolation, cache separation, immutable daily snapshot, updated holdings, code validation.');
