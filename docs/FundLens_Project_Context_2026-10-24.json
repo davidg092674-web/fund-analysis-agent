@@ -39,14 +39,14 @@
     "project_id": "appgprj_6adc968292cc8191b1c6bd04a0ba7ce1",
     "url": "https://fundlens-research.steadyseal5.chatgpt.site",
     "access": "owner-private",
-    "source_commit": "af8bdd464d676fc93bea7949e8533ed3f1da1603",
-    "deployment_id": "appgdep_6adcac7806f881919d8d9a11d911d741",
+    "source_commit": "645165587adfe74e73bbed968e6bc234737be699",
+    "deployment_id": "appgdep_6adcb17adde08191ab3b374d37721dbb",
     "deployment_status": "succeeded",
     "runtime": "Sites / Cloudflare Workers JavaScript",
     "storage": "D1",
     "identity": "Sites authenticated user ID",
     "python_engine_migrated": false,
-    "version_number": 3
+    "version_number": 4
   },
   "verified_new_work": [
     "TypeScript、17项历史指标/盘中模型/解析测试、隔离SQLite实际API集成测试和生产构建通过",
@@ -138,5 +138,24 @@
     "核实数据授权与更多市场/基金类型适配",
     "接入经核验的费用规则与复权收益",
     "真机验证和复用Python完整引擎"
-  ]
+  ],
+  "readability_update": {
+    "version": 4,
+    "scope": "responsive typography, fluid content width, contrast and compact wide layout",
+    "wide_preview_css_width": 2560,
+    "measured_font_px": {
+      "heading": 42.5,
+      "navigation": 20,
+      "notes": 16.25
+    },
+    "mobile_preview_css_width": 390,
+    "mobile_body_client_and_scroll_width": 375,
+    "mobile_dialog_client_and_scroll_width": 345,
+    "verification": [
+      "TypeScript passed",
+      "production build passed",
+      "browser desktop/wide/mobile/modal/report/settings QA passed"
+    ],
+    "data_logic_changed": false
+  }
 }
