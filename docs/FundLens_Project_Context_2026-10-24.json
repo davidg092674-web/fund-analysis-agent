@@ -1,0 +1,109 @@
+{
+  "schema_version": "2.0",
+  "project_name": "FundLens",
+  "updated_at": "2026-10-24",
+  "timezone": "Asia/Hong_Kong",
+  "historical_coverage": {
+    "complete": false,
+    "source_attachment": "FundLens_context_2026-10-20_2026-10-24.partial.json",
+    "missing_original_conversation_dates": [
+      "2026-10-20",
+      "2026-10-21",
+      "2026-10-22",
+      "2026-10-23"
+    ],
+    "note": "本次以可检查的仓库及部署证据补充工程状态，不声称恢复了缺失聊天正文。"
+  },
+  "goals": [
+    "私人云端PWA",
+    "手机脱离家用电脑和局域网",
+    "低长期成本",
+    "可追溯的每日基金研究报告",
+    "跨设备自选与持仓"
+  ],
+  "preferences": [
+    "优先直接修改GitHub并交付成品",
+    "减少重复手动操作",
+    "区分实现、验证和规划"
+  ],
+  "repository": {
+    "full_name": "davidg092674-web/fund-analysis-agent",
+    "default_branch": "master",
+    "baseline_commit": "b0b0f0c806d2c08428e5651661cf6ba68b305d98",
+    "baseline_tree": "f7b68f9d2e718f6a138b63191c5da22d3292ce4c",
+    "baseline_ci_url": "https://github.com/davidg092674-web/fund-analysis-agent/actions/runs/40076586619",
+    "baseline_ci_status": "success",
+    "new_pwa_source_directory": "cloud-pwa"
+  },
+  "cloud_pwa": {
+    "project_id": "appgprj_6adc968292cc8191b1c6bd04a0ba7ce1",
+    "url": "https://fundlens-research.steadyseal5.chatgpt.site",
+    "access": "owner-private",
+    "source_commit": "a7b95c721d47c82e59d430f10b329f802390e789",
+    "deployment_id": "appgdep_6adc9b0cb6a481918ada2f2a9c305ec2",
+    "deployment_status": "succeeded",
+    "runtime": "Sites / Cloudflare Workers JavaScript",
+    "storage": "D1",
+    "identity": "Sites authenticated user ID",
+    "python_engine_migrated": false
+  },
+  "verified_new_work": [
+    "TypeScript检查通过",
+    "8项历史指标与数据解析测试通过",
+    "实际API路由对独立SQLite的鉴权/跨源写入/租户隔离/缓存/快照不可变集成测试通过",
+    "桌面与390px手机宽度浏览器QA完成",
+    "私人部署成功",
+    "生产服务访问可读取已保存的更新流程revision 1",
+    "生产云端从Eastmoney取得110022真实历史净值：2026-10-23，261条",
+    "生产后台刷新空清单写入成功，并从独立状态接口读回匹配结果",
+    "每天香港时间22:30附近的弹性云端任务已创建并启用；尚未发生预定运行"
+  ],
+  "implementation": {
+    "entrypoint": "cloud-pwa/app/page.tsx",
+    "ui": "cloud-pwa/app/dashboard.tsx",
+    "api": "cloud-pwa/app/api/[...path]/route.ts",
+    "provider_and_metrics": "cloud-pwa/lib/research.ts",
+    "server_data": "cloud-pwa/lib/data-service.ts",
+    "database_schema": "cloud-pwa/db/schema.ts",
+    "migrations": "cloud-pwa/drizzle",
+    "workflow": "cloud-pwa/docs/refresh-workflow.md",
+    "pwa_manifest": "cloud-pwa/public/manifest.webmanifest",
+    "service_worker": "cloud-pwa/public/sw.js"
+  },
+  "limitations": [
+    "历史指标为未复权单位净值口径，不含分红再投资与费用",
+    "独立正式净值双源核验未完成",
+    "Python完整风险/预测/回测/详细日报尚未迁至此云端",
+    "截图OCR尚未迁移",
+    "精确分批申赎费用未实现",
+    "iPhone实际安装、移动网络及跨设备登录尚未由用户真机验证",
+    "当前界面及JSON导出展示最近100份归档",
+    "每基金每净值日只保留首次报告，修改持仓需重新生成查看现状"
+  ],
+  "data_rules": {
+    "independent_dual_source_verified": false,
+    "auto_trade_enabled": false,
+    "stale_calendar_days_warning": 7,
+    "cache_hours": 6,
+    "manual_refresh_min_seconds": 60,
+    "max_watchlist_funds": 25
+  },
+  "schedule": {
+    "status": "created_enabled",
+    "automation_id": "6adc9c53342081918ead683315a91f8c",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Hong_Kong:20261024T223000\nRRULE:FREQ=DAILY;BYHOUR=22;BYMINUTE=30;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "flexible_schedule",
+    "timezone": "Asia/Hong_Kong",
+    "linked_to_site": false,
+    "creation_method": "automations fallback after Sites create_schedule invalid_project",
+    "writer_verification": "production POST /api/jobs/refresh and GET /api/jobs/status matched persisted generatedAt; empty watchlist no-op",
+    "scheduled_occurrence_verification": "not_yet_run"
+  },
+  "next_priorities": [
+    "用户真机验证登录与主屏幕安装",
+    "复用FastAPI/Python完整引擎并评估实际部署成本",
+    "独立双源正式净值与基金类型披露日历",
+    "分批持仓与精确申赎费用",
+    "截图识别及风险变化提醒"
+  ]
+}
