@@ -22,6 +22,8 @@ export async function dataset(code: string, force = false): Promise<Dataset> {
   try { response = await fetch(`https://fund.eastmoney.com/pingzhongdata/${code}.js?v=${new Date().toISOString().slice(0, 10)}`, { headers: { "Referer": "https://fund.eastmoney.com/", "Accept": "*/*" }, signal: AbortSignal.timeout(15_000) }); }
   catch { throw new Error("云端暂时无法连接基金净值源。不会使用虚构数据替代，请稍后重试。"); }
   const result = parseEastmoney(await boundedText(response), code);
+  const prior = cache ? JSON.parse(cache.body) as Dataset : null;
+  result.availableAt = Object.fromEntries(result.points.map(p => [p.date, prior?.points.some(q => q.date === p.date && q.nav === p.nav) ? (prior.availableAt?.[p.date] || cache!.fetched_at) : result.fetchedAt]));
   await database().prepare("INSERT INTO nav_cache(code, body, fetched_at) VALUES (?, ?, ?) ON CONFLICT(code) DO UPDATE SET body=excluded.body, fetched_at=excluded.fetched_at").bind(code, JSON.stringify(result), result.fetchedAt).run();
   return result;
 }

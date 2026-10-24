@@ -1,5 +1,5 @@
 export type Point = { date: string; nav: number; dividend?: string };
-export type Dataset = { code: string; name: string; points: Point[]; fetchedAt: string; source: "eastmoney"; sourceUrl: string };
+export type Dataset = { code: string; name: string; points: Point[]; fetchedAt: string; source: "eastmoney"; sourceUrl: string; availableAt?: Record<string,string> };
 export type Position = { code: string; name?: string; shares: number | null; costNav: number | null; maxLoss: number | null; note: string; horizon: string };
 export type ResearchReport = {
   code: string; name: string; createdAt: string; fetchedAt: string; navDate: string;

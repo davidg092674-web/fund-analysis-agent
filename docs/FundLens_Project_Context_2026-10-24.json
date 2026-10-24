@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "project_name": "FundLens",
   "updated_at": "2026-10-24",
   "timezone": "Asia/Hong_Kong",
@@ -39,24 +39,24 @@
     "project_id": "appgprj_6adc968292cc8191b1c6bd04a0ba7ce1",
     "url": "https://fundlens-research.steadyseal5.chatgpt.site",
     "access": "owner-private",
-    "source_commit": "a7b95c721d47c82e59d430f10b329f802390e789",
-    "deployment_id": "appgdep_6adc9b0cb6a481918ada2f2a9c305ec2",
+    "source_commit": "af8bdd464d676fc93bea7949e8533ed3f1da1603",
+    "deployment_id": "appgdep_6adcac7806f881919d8d9a11d911d741",
     "deployment_status": "succeeded",
     "runtime": "Sites / Cloudflare Workers JavaScript",
     "storage": "D1",
     "identity": "Sites authenticated user ID",
-    "python_engine_migrated": false
+    "python_engine_migrated": false,
+    "version_number": 3
   },
   "verified_new_work": [
-    "TypeScript检查通过",
-    "8项历史指标与数据解析测试通过",
-    "实际API路由对独立SQLite的鉴权/跨源写入/租户隔离/缓存/快照不可变集成测试通过",
-    "桌面与390px手机宽度浏览器QA完成",
-    "私人部署成功",
-    "生产服务访问可读取已保存的更新流程revision 1",
-    "生产云端从Eastmoney取得110022真实历史净值：2026-10-23，261条",
-    "生产后台刷新空清单写入成功，并从独立状态接口读回匹配结果",
-    "每天香港时间22:30附近的弹性云端任务已创建并启用；尚未发生预定运行"
+    "TypeScript、17项历史指标/盘中模型/解析测试、隔离SQLite实际API集成测试和生产构建通过",
+    "桌面与390px手机布局、映射弹窗与图表浏览器QA完成",
+    "私人版本3部署成功，DB共9张业务表",
+    "生产市场实测Eastmoney HTTP520、腾讯回退可取得沪深300/沪深300ETF的报价、分钟序列、真实日OHLC",
+    "生产两条国家统计局/央行原始事件写入读回成功，保留首次观测时间",
+    "周六盘前作业正确跳过，正式净值空清单刷新与状态读回成功",
+    "工作日14:30后台任务已创建启用，约22:30原任务prompt已更新，14:45仅网页打开可见时刷新",
+    "生产真实自选为空，尚无真实有效盘前样本，未验证预测或策略收益"
   ],
   "implementation": {
     "entrypoint": "cloud-pwa/app/page.tsx",
@@ -68,17 +68,22 @@
     "migrations": "cloud-pwa/drizzle",
     "workflow": "cloud-pwa/docs/refresh-workflow.md",
     "pwa_manifest": "cloud-pwa/public/manifest.webmanifest",
-    "service_worker": "cloud-pwa/public/sw.js"
+    "service_worker": "cloud-pwa/public/sw.js",
+    "decision_ui": "cloud-pwa/app/decision-desk.tsx",
+    "intraday_model": "cloud-pwa/lib/intraday.ts",
+    "intraday_server": "cloud-pwa/lib/desk-service.ts",
+    "intraday_api": "cloud-pwa/lib/desk-api.ts"
   },
   "limitations": [
-    "历史指标为未复权单位净值口径，不含分红再投资与费用",
-    "独立正式净值双源核验未完成",
-    "Python完整风险/预测/回测/详细日报尚未迁至此云端",
-    "截图OCR尚未迁移",
-    "精确分批申赎费用未实现",
-    "iPhone实际安装、移动网络及跨设备登录尚未由用户真机验证",
-    "当前界面及JSON导出展示最近100份归档",
-    "每基金每净值日只保留首次报告，修改持仓需重新生成查看现状"
+    "完整Python风险/预测/回测引擎和截图识别尚未迁云",
+    "正式净值和行情未完成独立双源核验",
+    "当前沪深价格适配，QDII/债券/未知基金不输出A股加权净值",
+    "需手动确认资产映射、持仓披露与费率；费用未自动核验",
+    "情景估值不是已验证预测，无真实有效样本或未来超额收益证据",
+    "14:45更新需要网页打开且可见，非独立后台任务",
+    "真实自选为空，首次预定盘前执行尚未发生",
+    "分红观察期暂停未复权费用收益比较；原历史指标仍为未复权净值",
+    "真机PWA安装、移动网络和跨设备登录尚待用户验证"
   ],
   "data_rules": {
     "independent_dual_source_verified": false,
@@ -86,7 +91,20 @@
     "stale_calendar_days_warning": 7,
     "cache_hours": 6,
     "manual_refresh_min_seconds": 60,
-    "max_watchlist_funds": 25
+    "max_watchlist_funds": 25,
+    "mapping_min_coverage": 0.8,
+    "mapping_max_age_days": 120,
+    "quote_max_age_minutes": 6,
+    "forecast_validated": false,
+    "future_edge_available": false,
+    "freeze_available_information": true,
+    "exact_nav_date_match": true,
+    "minimum_direction_sample_count": 20,
+    "supported_markets": [
+      "SH",
+      "SZ"
+    ],
+    "manual_fee_scenarios": true
   },
   "schedule": {
     "status": "created_enabled",
@@ -97,13 +115,28 @@
     "linked_to_site": false,
     "creation_method": "automations fallback after Sites create_schedule invalid_project",
     "writer_verification": "production POST /api/jobs/refresh and GET /api/jobs/status matched persisted generatedAt; empty watchlist no-op",
-    "scheduled_occurrence_verification": "not_yet_run"
+    "scheduled_occurrence_verification": "not_yet_run",
+    "prompt_revision": 2,
+    "preclose": {
+      "automation_id": "6adcac1397e0819181c9dd3644682be2",
+      "title": "生成 FundLens 盘前报告",
+      "enabled": true,
+      "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Hong_Kong:20261026T143000\nRRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=14;BYMINUTE=30;BYSECOND=0\nEND:VEVENT",
+      "timing_mode": "exact_schedule",
+      "timezone": "Asia/Hong_Kong",
+      "scheduled_occurrence_verification": "not_yet_run"
+    },
+    "refresh1445": {
+      "mode": "visible browser tab timer or manual",
+      "unattended": false
+    },
+    "evening_revision": 2
   },
   "next_priorities": [
-    "用户真机验证登录与主屏幕安装",
-    "复用FastAPI/Python完整引擎并评估实际部署成本",
-    "独立双源正式净值与基金类型披露日历",
-    "分批持仓与精确申赎费用",
-    "截图识别及风险变化提醒"
+    "添加真实自选并手动确认资产/费率映射",
+    "积累无前视盘前快照与正式净值误差样本",
+    "核实数据授权与更多市场/基金类型适配",
+    "接入经核验的费用规则与复权收益",
+    "真机验证和复用Python完整引擎"
   ]
 }

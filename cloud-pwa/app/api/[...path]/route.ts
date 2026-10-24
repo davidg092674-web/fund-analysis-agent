@@ -1,3 +1,4 @@
+import { handleDesk } from '../../../lib/desk-api';
 import { database, cleanPosition, generate, readFunds, dataset } from "../../../lib/data-service";
 import { fundCode, makeReport } from "../../../lib/research";
 export const dynamic = "force-dynamic";
@@ -6,6 +7,7 @@ async function handle(request: Request) {
   const path = new URL(request.url).pathname.replace(/^\/api\//, ""), uid = request.headers.get("oai-authenticated-user-id");
   try {
     if (request.method !== "GET" && request.headers.get("origin") && request.headers.get("origin") !== new URL(request.url).origin) return json({ error: "请求来源不匹配。" }, 403);
+    const deskResponse = await handleDesk(request, path, uid); if (deskResponse) return deskResponse;
     // Shared updater relies on the owner-private Sites dispatch service boundary.
     // Changing this Site's audience requires replacing this authorization first.
     if (path === "jobs/refresh" && request.method === "POST") {
@@ -18,13 +20,13 @@ async function handle(request: Request) {
     }
     if (path === "jobs/instructions" && request.method === "GET") return json({ revision: 1, purpose: "Refresh owner-private FundLens watchlist NAV reports", authorization: "Obtain current platform service access from get_site; do not persist or print the token. Owner-private audience must be preserved.", update: "POST /api/jobs/refresh with OAI-Sites-Authorization bearer service access; no visitor identity is needed. Server fetches Eastmoney historical unit NAV and stores per-user daily reports. No trades or paid APIs.", verify: "GET /api/jobs/status with the same platform service access and confirm generatedAt and per-fund results match. Source errors stay errors; no synthetic fallback. Empty watchlist is a valid no-op. Do not add sample funds.", retry: "Read status before retrying an uncertain refresh. Daily report snapshots are idempotent by user, code and NAV date." });
     if (path === "jobs/probe" && request.method === "GET") return json({ report: makeReport(await dataset(fundCode(new URL(request.url).searchParams.get("code")))) });
-    if (path === "jobs/status" && request.method === "GET") { const r = await database().prepare("SELECT body FROM refresh_runs WHERE id != 'schedule_configuration' ORDER BY generated_at DESC LIMIT 1").first<{ body: string }>(); return json(r ? JSON.parse(r.body) : null); }
+    if (path === "jobs/status" && request.method === "GET") { const r = await database().prepare("SELECT body FROM refresh_runs WHERE id NOT IN ('schedule_configuration','desk_schedule_configuration') ORDER BY generated_at DESC LIMIT 1").first<{ body: string }>(); return json(r ? JSON.parse(r.body) : null); }
     if (path === "jobs/schedule" && request.method === "POST") { const b = await limitedBody(request); if (typeof b.time !== "string" || b.time.length > 100 || typeof b.enabled !== "boolean") return json({ error: "任务配置格式不正确。" }, 400); await database().prepare("INSERT INTO refresh_runs(id, body, generated_at) VALUES (?, ?, ?) ON CONFLICT(id) DO UPDATE SET body=excluded.body, generated_at=excluded.generated_at").bind("schedule_configuration", JSON.stringify({ time: b.time, enabled: b.enabled }), new Date().toISOString()).run(); return json({ ok: true }); }
     if (!uid) return json({ error: "请使用当前站点所有者的 ChatGPT 账户登录。" }, 401);
     if (path === "state" && request.method === "GET") {
       const funds = await readFunds(uid);
       const rows = await database().prepare("SELECT id, body FROM reports WHERE user_id = ? ORDER BY generated_at DESC LIMIT 100").bind(uid).all<{ id: string; body: string }>();
-      const run = await database().prepare("SELECT body FROM refresh_runs WHERE id != 'schedule_configuration' ORDER BY generated_at DESC LIMIT 1").first<{ body: string }>();
+      const run = await database().prepare("SELECT body FROM refresh_runs WHERE id NOT IN ('schedule_configuration','desk_schedule_configuration') ORDER BY generated_at DESC LIMIT 1").first<{ body: string }>();
       const config = await database().prepare("SELECT body FROM refresh_runs WHERE id = 'schedule_configuration'").first<{body: string}>();
       return json({ schedule: config ? JSON.parse(config.body) : null, funds, reports: rows.results.map(r => ({ id: r.id, ...JSON.parse(r.body) })), lastRefresh: run ? JSON.parse(run.body) : null });
     }
