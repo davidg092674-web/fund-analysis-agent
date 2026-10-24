@@ -16,6 +16,21 @@ targets:
       - path: Assets.xcassets
     info:
       path: Info.plist
+      properties:
+        CFBundleDisplayName: FundLens
+        CFBundleName: FundLens
+        CFBundleShortVersionString: '0.2.1'
+        CFBundleVersion: '3'
+        UILaunchScreen: {}
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIRequiresFullScreen: true
+        NSPhotoLibraryUsageDescription: '选择基金截图，在设备本地识别基金代码，不会上传截图。'
+        NSLocalNetworkUsageDescription: '连接你自己的电脑上的基金分析服务。'
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.personal.fundlens.iphone18pro
