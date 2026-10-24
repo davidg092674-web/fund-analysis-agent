@@ -29,6 +29,7 @@ from backtest_engine import run_backtest
 from decision_advisor import build_decision_advice
 from final_decision import build_final_decision
 from high_confidence_filter import build_high_confidence_decision
+from daily_report import build_daily_report
 from prediction_engine import is_specific_trained_fund
 
 load_dotenv()
@@ -197,6 +198,14 @@ def _run_analysis(code: str, position: Optional[dict] = None) -> AnalyzeResponse
     )
     logger.info(f"高置信度决策: action={high_confidence_decision.get('action')}, confidence={high_confidence_decision.get('confidence')}")
 
+    # Step 13: 生成透明、可审计的每日基金研究报告
+    daily_report = build_daily_report(
+        fund=fund_info, fund_profile=fund_profile, metrics=metrics,
+        risk=risk, forecast=forecast, prediction=prediction,
+        backtest=backtest_result, final_decision=final_decision,
+        position=position,
+    )
+
     return AnalyzeResponse(
         success=True,
         code=code,
@@ -212,6 +221,7 @@ def _run_analysis(code: str, position: Optional[dict] = None) -> AnalyzeResponse
         decision_advice=decision_advice,
         final_decision=final_decision,
         high_confidence_decision=high_confidence_decision,
+        daily_report=daily_report,
     )
 
 
@@ -339,6 +349,7 @@ async def batch_analyze_my_funds():
                 decision_advice=analysis.decision_advice,
                 final_decision=analysis.final_decision,
                 high_confidence_decision=analysis.high_confidence_decision,
+                daily_report=analysis.daily_report,
             ))
             logger.info(f"批量分析 {code}: success={analysis.success}")
         except Exception as e:
