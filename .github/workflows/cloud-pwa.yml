@@ -32,7 +32,7 @@ jobs:
       - name: Check types
         run: pnpm exec tsc --noEmit
       - name: Test research and source validation
-        run: node --experimental-strip-types --test tests/research.test.ts tests/intraday.test.ts tests/catalog.test.ts
+        run: node --experimental-strip-types --test tests/research.test.ts tests/intraday.test.ts tests/catalog.test.ts tests/plan-import.test.ts
       - name: Test authentication, ownership, caching and snapshots
         run: node --experimental-vm-modules tests/api-integration.mjs
       - name: Build private cloud application
